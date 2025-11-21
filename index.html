@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WordPress REST API Explorer (Enhanced)</title>
+    <title>WordPress REST API Explorer</title>
     <style>
         * {
             margin: 0;
@@ -363,9 +363,6 @@
             color: #1f2937;
             margin-bottom: 0.5rem;
             word-break: break-all;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
         }
 
         .route-namespace {
@@ -452,107 +449,11 @@
             border-radius: 0.25rem;
             font-size: 0.75rem;
         }
-        
-        /* --- NEW STYLES for Functionality --- */
-        .filter-select {
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            min-width: 150px;
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 1.5rem;
-        }
-        .tab-btn {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            font-weight: 600;
-            color: #6b7280;
-            transition: color 0.3s;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -1px; 
-        }
-        .tab-btn.active {
-            color: #3b82f6;
-            border-bottom: 3px solid #3b82f6;
-        }
-
-        .test-panel-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-        @media (max-width: 768px) {
-            .test-panel-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .input-group label {
-            display: block;
-            font-size: 0.875rem;
-            color: #374151;
-            margin-bottom: 0.25rem;
-            font-weight: 600;
-        }
-        .input-group input, .input-group textarea, .input-group select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-family: monospace;
-        }
-        .input-group textarea {
-            min-height: 150px;
-            font-family: 'Courier New', monospace;
-        }
-        .response-viewer {
-            background: #1f2937;
-            color: #f3f4f6;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            white-space: pre-wrap;
-            word-break: break-all;
-            font-size: 0.8rem;
-            min-height: 200px;
-            overflow: auto;
-            position: relative;
-        }
-        .copy-btn {
-            background: #d1d5db;
-            color: #374151;
-            padding: 0.25rem 0.5rem;
-            border: none;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-left: 0.75rem;
-        }
-        .copy-btn:hover { background: #9ca3af; }
-
-        .load-more-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-        .load-more-btn:hover { background: #e5e7eb; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Upload Screen -->
         <div id="uploadScreen" class="upload-screen">
             <div class="upload-icon">📄</div>
             <h1>WordPress REST API Explorer</h1>
@@ -583,14 +484,16 @@
                 <button id="loadUrlBtn" class="upload-btn" style="width: 100%;">
                     🌐 Load from URL
                 </button>
-                <p id="urlError" class="hidden" style="color: #ef4444; margin-top: 0.5rem; font-size: 0.875rem;">Loading</p>
+                <p id="urlError" class="hidden" style="color: #ef4444; margin-top: 0.5rem; font-size: 0.875rem;"></p>
                 <p id="urlLoading" class="hidden" style="color: #3b82f6; margin-top: 0.5rem; font-size: 0.875rem;">
                     ⏳ Loading API data...
                 </p>
             </div>
         </div>
 
+        <!-- Main App -->
         <div id="mainApp" class="hidden">
+            <!-- Header -->
             <div class="header">
                 <div class="header-top">
                     <div class="header-title">
@@ -609,27 +512,27 @@
                 <div class="stats-grid" id="statsGrid"></div>
             </div>
 
+            <!-- Filters -->
             <div class="filters">
                 <div class="filters-content">
                     <div class="search-box">
                         <span class="search-icon">🔍</span>
                         <input type="text" id="searchInput" placeholder="Search routes...">
                     </div>
-                    <select id="namespaceFilter" class="filter-select"></select>
                     <div class="method-filters" id="methodFilters"></div>
                 </div>
             </div>
 
+            <!-- Content -->
             <div class="content-grid">
                 <div class="routes-panel">
-                    <h3>Routes (<span id="routeCount">0</span>/<span id="totalRouteCount">0</span>)</h3>
+                    <h3>Routes (<span id="routeCount">0</span>)</h3>
                     <div id="routesList"></div>
-                    <button id="loadMoreRoutes" class="load-more-btn hidden">Load More Routes</button>
                 </div>
                 <div class="details-panel" id="detailsPanel">
                     <div class="empty-state">
                         <div class="empty-icon">ℹ️</div>
-                        <p class="empty-text">Select a route to view details or test the endpoint</p>
+                        <p class="empty-text">Select a route to view details</p>
                     </div>
                 </div>
             </div>
@@ -638,14 +541,10 @@
 
     <script>
         let apiData = null;
-        let apiBaseUrl = '';
         let searchTerm = '';
         let filterMethod = 'ALL';
-        let filterNamespace = 'ALL';
-        let routeLimit = 50; // Initial number of routes to show
-        let currentRoute = null; // Currently selected route path
 
-        // --- Core Handlers ---
+        // File upload handlers
         document.getElementById('fileInput').addEventListener('change', handleFileUpload);
         document.getElementById('reloadFile').addEventListener('change', handleFileUpload);
         document.getElementById('loadUrlBtn').addEventListener('click', handleUrlLoad);
@@ -656,41 +555,39 @@
         });
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value.toLowerCase();
-            routeLimit = 50; // Reset limit on search
-            renderRoutes();
-        });
-        document.getElementById('namespaceFilter').addEventListener('change', (e) => {
-            filterNamespace = e.target.value;
-            routeLimit = 50; // Reset limit on filter change
-            renderRoutes();
-        });
-        document.getElementById('loadMoreRoutes').addEventListener('click', () => {
-            routeLimit += 50; // Load 50 more routes
             renderRoutes();
         });
 
-        // --- URL Loading Logic (Enhanced to get base URL) ---
         async function handleUrlLoad() {
             const urlInput = document.getElementById('urlInput');
             const url = urlInput.value.trim();
             const errorEl = document.getElementById('urlError');
             const loadingEl = document.getElementById('urlLoading');
 
-            if (!url) { showError('Please enter a URL'); return; }
+            // Validate URL
+            if (!url) {
+                showError('Please enter a URL');
+                return;
+            }
 
+            // Ensure URL ends with /wp-json if not already
             let apiUrl = url;
             if (!apiUrl.includes('/wp-json')) {
                 apiUrl = apiUrl.replace(/\/$/, '') + '/wp-json';
             }
-            apiBaseUrl = apiUrl.replace(/\/wp-json\/?$/, ''); // Set base URL for testing
 
+            // Show loading state
             errorEl.classList.add('hidden');
             loadingEl.classList.remove('hidden');
             document.getElementById('loadUrlBtn').disabled = true;
 
             try {
                 const response = await fetch(apiUrl);
-                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
                 apiData = data;
                 initializeApp();
@@ -717,7 +614,6 @@
             reader.onload = (event) => {
                 try {
                     apiData = JSON.parse(event.target.result);
-                    apiBaseUrl = apiData.home ? apiData.home.replace(/\/$/, '') : ''; // Try to get a base URL from the data
                     initializeApp();
                 } catch (error) {
                     alert('Invalid JSON file. Please upload a valid WordPress REST API JSON.');
@@ -732,27 +628,22 @@
             
             // Update header
             document.getElementById('apiName').textContent = apiData.name || 'WordPress REST API';
-            document.getElementById('apiUrl').textContent = apiData.url || apiBaseUrl || '';
+            document.getElementById('apiUrl').textContent = apiData.url || '';
             document.getElementById('apiDescription').textContent = apiData.description || '';
             
             // Render stats
             renderStats();
             
-            // Render filters
+            // Render method filters
             renderMethodFilters();
-            renderNamespaceFilter();
             
             // Render routes
             renderRoutes();
-
-            // Clear details
-            document.getElementById('detailsPanel').innerHTML = `<div class="empty-state"><div class="empty-icon">ℹ️</div><p class="empty-text">Select a route to view details or test the endpoint</p></div>`;
         }
 
         function renderStats() {
-            const routesCount = Object.keys(apiData.routes || {}).length;
             const stats = [
-                { icon: '💾', value: routesCount, label: 'Total Routes', color: 'blue' },
+                { icon: '💾', value: Object.keys(apiData.routes || {}).length, label: 'Routes', color: 'blue' },
                 { icon: '🏷️', value: (apiData.namespaces || []).length, label: 'Namespaces', color: 'green' },
                 { icon: 'ℹ️', value: (apiData.authentication || []).length, label: 'Auth Methods', color: 'purple' },
                 { icon: '🌐', value: apiData.timezone_string || 'UTC', label: 'Timezone', color: 'orange' }
@@ -782,142 +673,53 @@
 
         function setMethodFilter(method) {
             filterMethod = method;
-            routeLimit = 50; // Reset limit on filter change
             renderMethodFilters();
             renderRoutes();
-        }
-
-        function renderNamespaceFilter() {
-            const namespaces = ['ALL', ...(apiData.namespaces || [])];
-            const selectEl = document.getElementById('namespaceFilter');
-            
-            const options = namespaces.map(ns => `
-                <option value="${ns}" ${ns === filterNamespace ? 'selected' : ''}>
-                    ${ns === 'ALL' ? 'All Namespaces' : ns}
-                </option>
-            `).join('');
-            
-            selectEl.innerHTML = options;
         }
 
         function getFilteredRoutes() {
             if (!apiData?.routes) return [];
             
-            const allRoutes = Object.entries(apiData.routes);
-
-            const filtered = allRoutes.filter(([route, details]) => {
+            return Object.entries(apiData.routes).filter(([route, details]) => {
                 const matchesSearch = route.toLowerCase().includes(searchTerm);
                 const methods = details.methods || [];
                 const matchesMethod = filterMethod === 'ALL' || methods.includes(filterMethod);
-                const matchesNamespace = filterNamespace === 'ALL' || details.namespace === filterNamespace;
-                return matchesSearch && matchesMethod && matchesNamespace;
+                return matchesSearch && matchesMethod;
             });
-            
-            return filtered;
-        }
-        
-        // --- NEW HELPER FUNCTION TO SAFELY HANDLE ROUTE SELECTION ---
-        function handleRouteSelection(buttonElement) {
-            // Retrieve and un-escape the path stored in the data attribute
-            const route = buttonElement.getAttribute('data-route-path').replace(/&apos;/g, "'"); 
-            selectRoute(route);
         }
 
-        // --- RENDER ROUTES (FIXED) ---
         function renderRoutes() {
             const filteredRoutes = getFilteredRoutes();
-            const routesToShow = filteredRoutes.slice(0, routeLimit);
-            
-            document.getElementById('routeCount').textContent = routesToShow.length;
-            document.getElementById('totalRouteCount').textContent = filteredRoutes.length;
+            document.getElementById('routeCount').textContent = filteredRoutes.length;
 
-            const html = routesToShow.map(([route, details]) => {
-                // Safely escape single quotes for embedding in a data attribute
-                const safeRoutePath = route.replace(/'/g, "&apos;"); 
-
-                return `
-                    <div class="route-item" id="route-item-${btoa(route).replace(/=/g, '')}">
-                        <button class="route-button" data-route-path="${safeRoutePath}" onclick="handleRouteSelection(this)">
-                            <div class="route-info">
-                                <code class="route-path">${route}</code>
-                                <div class="route-methods">
-                                    ${(details.methods || []).slice(0, 3).map(method => 
-                                        `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-                                    ).join('')}
-                                </div>
+            const html = filteredRoutes.map(([route, details]) => `
+                <div class="route-item">
+                    <button class="route-button" onclick='selectRoute(${JSON.stringify(route)})'>
+                        <div class="route-info">
+                            <code class="route-path">${route}</code>
+                            <div class="route-methods">
+                                ${(details.methods || []).slice(0, 3).map(method => 
+                                    `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
+                                ).join('')}
                             </div>
-                            <span class="chevron">▶</span>
-                        </button>
-                    </div>
-                `;
-            }).join('');
+                        </div>
+                        <span class="chevron">▶</span>
+                    </button>
+                </div>
+            `).join('');
 
             document.getElementById('routesList').innerHTML = html || '<p style="color: #6b7280; padding: 1rem;">No routes found</p>';
-
-            // Handle Load More Button
-            const loadMoreBtn = document.getElementById('loadMoreRoutes');
-            if (filteredRoutes.length > routeLimit) {
-                loadMoreBtn.classList.remove('hidden');
-                loadMoreBtn.textContent = `Load More Routes (${Math.min(filteredRoutes.length - routeLimit, 50)} remaining)`;
-            } else {
-                loadMoreBtn.classList.add('hidden');
-            }
-
-            // Highlight the currently selected route
-            if (currentRoute) {
-                document.querySelectorAll('.route-item').forEach(el => el.style.border = '1px solid #e5e7eb');
-                const selectedEl = document.getElementById(`route-item-${btoa(currentRoute).replace(/=/g, '')}`);
-                if (selectedEl) {
-                    selectedEl.style.border = '2px solid #3b82f6';
-                }
-            }
         }
 
         function selectRoute(route) {
-            currentRoute = route;
-            renderRoutes(); // Re-render to highlight selected route
-            
             const details = apiData.routes[route];
-            renderDetailsPanel(route, details, 'documentation');
+            renderRouteDetails(route, details);
         }
 
-        function renderDetailsPanel(route, details, activeTab) {
-            const panel = document.getElementById('detailsPanel');
-            
-            const tabsHtml = `
-                <div class="tabs">
-                    <button class="tab-btn ${activeTab === 'documentation' ? 'active' : ''}" onclick="renderDetailsPanel('${route.replace(/'/g, "\\'")}', apiData.routes['${route.replace(/'/g, "\\'')}'], 'documentation')">
-                        Documentation
-                    </button>
-                    <button class="tab-btn ${activeTab === 'test' ? 'active' : ''}" onclick="renderDetailsPanel('${route.replace(/'/g, "\\'")}', apiData.routes['${route.replace(/'/g, "\\'')}'], 'test')">
-                        Test Endpoint
-                    </button>
-                </div>
-            `;
-            
-            let contentHtml = '';
-            
-            if (activeTab === 'documentation') {
-                contentHtml = renderDocumentation(route, details);
-            } else if (activeTab === 'test') {
-                contentHtml = renderTestPanel(route, details);
-            }
-
-            panel.innerHTML = tabsHtml + contentHtml;
-        }
-
-        function renderDocumentation(route, details) {
-            // Check if route has path parameters (e.g., /(?P<id>[\d]+))
-            const routePathDisplay = route.replace(/\(\?P<([^>]+)>[^)]+\)/g, '{$1}');
-
-            let html = `
+        function renderRouteDetails(route, details) {
+            const html = `
                 <div class="route-header">
-                    <h3 class="route-title">
-                        ${routePathDisplay}
-                        <button class="copy-btn" onclick="copyToClipboard('${apiBaseUrl}/wp-json${routePathDisplay}')">
-                            📋 Copy
-                        </button>
-                    </h3>
+                    <h3 class="route-title">${route}</h3>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         ${(details.methods || []).map(method => 
                             `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
@@ -928,7 +730,6 @@
 
                 ${(details.endpoints || []).map((endpoint, idx) => `
                     <div class="endpoint-section">
-                        <p style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Endpoint #${idx + 1}</p>
                         <div class="endpoint-methods">
                             ${(endpoint.methods || []).map(method => 
                                 `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
@@ -948,7 +749,6 @@
                                             ${argDetails.type ? `<span class="parameter-type">${Array.isArray(argDetails.type) ? argDetails.type.join(' | ') : argDetails.type}</span>` : ''}
                                         </div>
                                         ${argDetails.description ? `<p class="parameter-description">${argDetails.description}</p>` : ''}
-                                        ${argDetails.context ? `<p class="parameter-meta">Context: <code>${argDetails.context}</code></p>` : ''}
                                         ${argDetails.default !== undefined ? `<p class="parameter-meta">Default: <code>${JSON.stringify(argDetails.default)}</code></p>` : ''}
                                         ${argDetails.enum ? `<p class="parameter-meta">Values: ${argDetails.enum.map(v => `<code>${v}</code>`).join(', ')}</p>` : ''}
                                     </div>
@@ -958,144 +758,8 @@
                     </div>
                 `).join('')}
             `;
-            return html;
-        }
 
-
-        function renderTestPanel(route, details) {
-            // Get all methods for the route
-            const methods = details.methods || [];
-            // Replace WP regex path params with standard {param} placeholder for the tester
-            const testPath = route.replace(/\(\?P<([^>]+)>[^)]+\)/g, '/{$1}');
-            
-            let html = `
-                <div class="route-header">
-                    <h3 class="route-title">
-                        Testing: ${route}
-                    </h3>
-                </div>
-
-                <div class="test-panel-grid">
-                    <div class="request-builder">
-                        <div class="input-group" style="margin-bottom: 1rem;">
-                            <label for="testMethod">HTTP Method</label>
-                            <select id="testMethod" style="font-family: sans-serif;">
-                                ${methods.map(m => `<option value="${m}">${m}</option>`).join('')}
-                            </select>
-                        </div>
-
-                        <div class="input-group" style="margin-bottom: 1rem;">
-                            <label for="testUrl">Full Endpoint URL (Adjust path parameters like {id})</label>
-                            <input type="text" id="testUrl" value="${apiBaseUrl}/wp-json${testPath}">
-                        </div>
-
-                        <div class="input-group" style="margin-bottom: 1rem;">
-                            <label for="requestBody">Request Body (JSON for POST/PUT/PATCH)</label>
-                            <textarea id="requestBody" placeholder='{"title": "New Post Title"}'></textarea>
-                        </div>
-                        
-                        <h4 class="parameters-title">Authentication (Optional)</h4>
-                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                            <div class="input-group" style="flex: 1;">
-                                <label for="authUsername">Username (Basic Auth)</label>
-                                <input type="text" id="authUsername">
-                            </div>
-                            <div class="input-group" style="flex: 1;">
-                                <label for="authPassword">Password/App Pass (Basic Auth)</label>
-                                <input type="password" id="authPassword">
-                            </div>
-                        </div>
-
-                        <button class="upload-btn" style="width: 100%;" onclick="sendApiRequest()">
-                            ⚡ Send Request
-                        </button>
-                    </div>
-
-                    <div class="response-container">
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Response <span id="responseStatus" style="font-weight: normal;"></span></label>
-                        <div id="responseViewer" class="response-viewer">
-                            Ready to send request...
-                        </div>
-                    </div>
-                </div>
-            `;
-            return html;
-        }
-
-        // --- API Testing Logic ---
-        async function sendApiRequest() {
-            const method = document.getElementById('testMethod').value;
-            const url = document.getElementById('testUrl').value;
-            const bodyContent = document.getElementById('requestBody').value;
-            const username = document.getElementById('authUsername').value;
-            const password = document.getElementById('authPassword').value;
-            const viewer = document.getElementById('responseViewer');
-            const statusEl = document.getElementById('responseStatus');
-
-            viewer.textContent = 'Sending request...';
-            statusEl.textContent = '';
-
-            const options = {
-                method: method,
-                headers: {}
-            };
-
-            // Set Body for non-GET/HEAD requests
-            if (method !== 'GET' && method !== 'HEAD' && bodyContent) {
-                try {
-                    options.body = JSON.stringify(JSON.parse(bodyContent));
-                    options.headers['Content-Type'] = 'application/json';
-                } catch (e) {
-                    viewer.textContent = `ERROR: Request Body is not valid JSON. Please check your syntax.`;
-                    return;
-                }
-            }
-            
-            // Basic Authentication
-            if (username && password) {
-                const base64Credentials = btoa(`${username}:${password}`);
-                options.headers['Authorization'] = `Basic ${base64Credentials}`;
-            }
-
-            try {
-                const response = await fetch(url, options);
-                
-                statusEl.textContent = `(Status: ${response.status} ${response.statusText})`;
-                
-                let responseText = await response.text();
-
-                try {
-                    const json = JSON.parse(responseText);
-                    viewer.textContent = JSON.stringify(json, null, 2);
-                } catch (e) {
-                    // Not JSON (e.g., 404 HTML or empty body)
-                    viewer.textContent = responseText || `Response received, but body is empty. Status: ${response.status}`;
-                }
-
-                // Color status based on response code
-                if (response.status >= 200 && response.status < 300) {
-                    statusEl.style.color = '#10b981'; // Green
-                } else if (response.status >= 400) {
-                    statusEl.style.color = '#ef4444'; // Red
-                } else {
-                    statusEl.style.color = '#f97316'; // Orange/Other
-                }
-
-            } catch (error) {
-                statusEl.textContent = '(Status: FAILED)';
-                statusEl.style.color = '#ef4444';
-                viewer.textContent = `NETWORK ERROR: Could not send request. Check your URL, CORS settings, and console for details. Error: ${error.message}`;
-            }
-        }
-
-        // --- Utility: Copy to Clipboard ---
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard: ' + text);
-            }).catch(err => {
-                console.error('Could not copy text: ', err);
-                alert('Failed to copy text. Check console for error.');
-            });
+            document.getElementById('detailsPanel').innerHTML = html;
         }
     </script>
 </body>
