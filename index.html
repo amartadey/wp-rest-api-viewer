@@ -3,764 +3,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WordPress REST API Explorer</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
-            min-height: 100vh;
-            padding: 1rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .upload-screen {
-            max-width: 600px;
-            margin: 100px auto;
-            background: white;
-            padding: 3rem;
-            border-radius: 1rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-
-        .upload-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 2rem;
-            background: #3b82f6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 40px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: #1f2937;
-            margin-bottom: 1rem;
-        }
-
-        .upload-description {
-            color: #6b7280;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .upload-btn {
-            background: #3b82f6;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .upload-btn:hover {
-            background: #2563eb;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .header {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .header-title h2 {
-            font-size: 1.875rem;
-            color: #1f2937;
-        }
-
-        .header-url {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .reload-btn {
-            background: #6b7280;
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: background 0.3s;
-        }
-
-        .reload-btn:hover {
-            background: #4b5563;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-card {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .stat-card.blue { background: #dbeafe; }
-        .stat-card.green { background: #d1fae5; }
-        .stat-card.purple { background: #e9d5ff; }
-        .stat-card.orange { background: #fed7aa; }
-
-        .stat-icon {
-            font-size: 1.5rem;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-
-        .filters {
-            background: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        .filters-content {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 0.5rem 0.5rem 0.5rem 2.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-        }
-
-        .method-filters {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .method-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        .method-btn:hover {
-            background: #d1d5db;
-        }
-
-        .method-btn.active {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 1024px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .routes-panel {
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 1rem;
-            max-height: calc(100vh - 400px);
-            overflow-y: auto;
-        }
-
-        .routes-panel h3 {
-            font-size: 1.25rem;
-            color: #1f2937;
-            margin-bottom: 1rem;
-        }
-
-        .route-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            overflow: hidden;
-        }
-
-        .route-button {
-            width: 100%;
-            text-align: left;
-            padding: 0.75rem;
-            border: none;
-            background: white;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .route-button:hover {
-            background: #f9fafb;
-        }
-
-        .route-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .route-path {
-            font-family: 'Courier New', monospace;
-            color: #2563eb;
-            font-size: 0.875rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: block;
-        }
-
-        .route-methods {
-            display: flex;
-            gap: 0.25rem;
-            margin-top: 0.25rem;
-            flex-wrap: wrap;
-        }
-
-        .method-badge {
-            font-size: 0.75rem;
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .method-badge.get { background: #3b82f6; }
-        .method-badge.post { background: #10b981; }
-        .method-badge.put { background: #eab308; }
-        .method-badge.patch { background: #f97316; }
-        .method-badge.delete { background: #ef4444; }
-
-        .chevron {
-            color: #9ca3af;
-            transition: transform 0.3s;
-        }
-
-        .details-panel {
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            max-height: calc(100vh - 400px);
-            overflow-y: auto;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            color: #d1d5db;
-            margin-bottom: 1rem;
-        }
-
-        .empty-text {
-            color: #6b7280;
-        }
-
-        .route-header {
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .route-title {
-            font-size: 1.5rem;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-            word-break: break-all;
-        }
-
-        .route-namespace {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-        }
-
-        .endpoint-section {
-            background: #f9fafb;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .endpoint-methods {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .endpoint-methods .method-badge {
-            font-size: 0.875rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .parameters-title {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.75rem;
-        }
-
-        .parameter-item {
-            background: white;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            border: 1px solid #e5e7eb;
-            margin-bottom: 0.5rem;
-        }
-
-        .parameter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 0.5rem;
-        }
-
-        .parameter-name {
-            font-family: 'Courier New', monospace;
-            color: #2563eb;
-            font-size: 0.875rem;
-        }
-
-        .required-badge {
-            background: #fee2e2;
-            color: #991b1b;
-            font-size: 0.75rem;
-            padding: 0.125rem 0.5rem;
-            border-radius: 0.25rem;
-            margin-left: 0.5rem;
-        }
-
-        .parameter-type {
-            color: #6b7280;
-            font-size: 0.75rem;
-        }
-
-        .parameter-description {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .parameter-meta {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-        }
-
-        .parameter-meta code {
-            background: #f3f4f6;
-            padding: 0.125rem 0.25rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-        }
-    </style>
+    <meta name="description" content="Advanced WordPress REST API Explorer - Test, explore, and document WordPress REST APIs with ease">
+    <meta name="keywords" content="WordPress, REST API, API Explorer, API Testing, WordPress Development">
+    <title>WordPress REST API Explorer Pro</title>
+    
+    <!-- Iconify Icons -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <!-- Upload Screen -->
         <div id="uploadScreen" class="upload-screen">
-            <div class="upload-icon">📄</div>
-            <h1>WordPress REST API Explorer</h1>
+            <div class="upload-icon">
+                <span class="iconify" data-icon="mdi:api" data-width="60"></span>
+            </div>
+            <h1>WordPress REST API Explorer Pro</h1>
             <p class="upload-description">
-                Upload your WordPress REST API JSON file or load it directly from a URL to explore all available endpoints, methods, and parameters.
+                Upload your WordPress REST API JSON file or load it directly from a URL to explore, test, and document all available endpoints.
             </p>
             
-            <div style="margin-bottom: 1.5rem;">
+            <div class="upload-options">
                 <label for="fileInput" class="upload-btn">
-                    📁 Upload JSON File
+                    <span class="iconify" data-icon="mdi:file-upload"></span>
+                    Upload JSON File
                 </label>
                 <input type="file" id="fileInput" accept=".json" class="hidden">
             </div>
 
-            <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;">
-                <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
-                <span style="color: #6b7280; font-weight: 600;">OR</span>
-                <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
+            <div class="divider">
+                <span>OR</span>
             </div>
 
-            <div style="margin-top: 1.5rem;">
+            <div class="url-input-section">
                 <input 
                     type="url" 
                     id="urlInput" 
                     placeholder="https://example.com/wp-json"
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; margin-bottom: 1rem;"
+                    class="url-input"
                 >
-                <button id="loadUrlBtn" class="upload-btn" style="width: 100%;">
-                    🌐 Load from URL
+                <button id="loadUrlBtn" class="upload-btn">
+                    <span class="iconify" data-icon="mdi:web"></span>
+                    Load from URL
                 </button>
-                <p id="urlError" class="hidden" style="color: #ef4444; margin-top: 0.5rem; font-size: 0.875rem;"></p>
-                <p id="urlLoading" class="hidden" style="color: #3b82f6; margin-top: 0.5rem; font-size: 0.875rem;">
-                    ⏳ Loading API data...
+                <p id="urlError" class="hidden error-message"></p>
+                <p id="urlLoading" class="hidden loading-message">
+                    <span class="iconify rotating" data-icon="mdi:loading"></span>
+                    Loading API data...
                 </p>
+            </div>
+
+            <div class="demo-section">
+                <button id="loadDemoBtn" class="demo-btn">
+                    <span class="iconify" data-icon="mdi:play-circle"></span>
+                    Try Demo API
+                </button>
             </div>
         </div>
 
         <!-- Main App -->
         <div id="mainApp" class="hidden">
             <!-- Header -->
-            <div class="header">
+            <header class="header">
                 <div class="header-top">
                     <div class="header-title">
-                        <span style="font-size: 2rem;">🌐</span>
+                        <span class="iconify" data-icon="mdi:api" data-width="40"></span>
                         <div>
                             <h2 id="apiName">WordPress REST API</h2>
                             <div id="apiUrl" class="header-url"></div>
                         </div>
                     </div>
-                    <label for="reloadFile" class="reload-btn">
-                        Load Different File
-                    </label>
-                    <input type="file" id="reloadFile" accept=".json" class="hidden">
+                    <div class="header-actions">
+                        <button id="themeToggle" class="icon-btn" title="Toggle Dark Mode">
+                            <span class="iconify" data-icon="mdi:theme-light-dark"></span>
+                        </button>
+                        <button id="exportBtn" class="icon-btn" title="Export Data">
+                            <span class="iconify" data-icon="mdi:download"></span>
+                        </button>
+                        <button id="settingsBtn" class="icon-btn" title="Settings">
+                            <span class="iconify" data-icon="mdi:cog"></span>
+                        </button>
+                        <label for="reloadFile" class="reload-btn">
+                            <span class="iconify" data-icon="mdi:refresh"></span>
+                            Load Different File
+                        </label>
+                        <input type="file" id="reloadFile" accept=".json" class="hidden">
+                    </div>
                 </div>
-                <div id="apiDescription" class="upload-description" style="text-align: left; margin: 0;"></div>
+                <div id="apiDescription" class="api-description"></div>
                 <div class="stats-grid" id="statsGrid"></div>
+            </header>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="explorer">
+                    <span class="iconify" data-icon="mdi:compass"></span>
+                    Explorer
+                </button>
+                <button class="tab-btn" data-tab="tester">
+                    <span class="iconify" data-icon="mdi:test-tube"></span>
+                    API Tester
+                </button>
+                <button class="tab-btn" data-tab="history">
+                    <span class="iconify" data-icon="mdi:history"></span>
+                    History
+                    <span class="badge" id="historyBadge">0</span>
+                </button>
+                <button class="tab-btn" data-tab="favorites">
+                    <span class="iconify" data-icon="mdi:star"></span>
+                    Favorites
+                    <span class="badge" id="favoritesBadge">0</span>
+                </button>
+                <button class="tab-btn" data-tab="docs">
+                    <span class="iconify" data-icon="mdi:book-open"></span>
+                    Documentation
+                </button>
             </div>
 
-            <!-- Filters -->
-            <div class="filters">
-                <div class="filters-content">
-                    <div class="search-box">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="searchInput" placeholder="Search routes...">
+            <!-- Explorer Tab -->
+            <div id="explorerTab" class="tab-content active">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filters-content">
+                        <div class="search-box">
+                            <span class="iconify search-icon" data-icon="mdi:magnify"></span>
+                            <input type="text" id="searchInput" placeholder="Search routes...">
+                        </div>
+                        <select id="namespaceFilter" class="filter-select">
+                            <option value="ALL">All Namespaces</option>
+                        </select>
+                        <div class="method-filters" id="methodFilters"></div>
                     </div>
-                    <div class="method-filters" id="methodFilters"></div>
+                </div>
+
+                <!-- Content -->
+                <div class="content-grid">
+                    <div class="routes-panel">
+                        <div class="panel-header">
+                            <h3>Routes (<span id="routeCount">0</span>)</h3>
+                            <div class="panel-actions">
+                                <button id="expandAllBtn" class="small-btn">
+                                    <span class="iconify" data-icon="mdi:unfold-more-horizontal"></span>
+                                </button>
+                                <button id="collapseAllBtn" class="small-btn">
+                                    <span class="iconify" data-icon="mdi:unfold-less-horizontal"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="routesList"></div>
+                    </div>
+                    <div class="details-panel" id="detailsPanel">
+                        <div class="empty-state">
+                            <span class="iconify empty-icon" data-icon="mdi:information-outline"></span>
+                            <p class="empty-text">Select a route to view details</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Content -->
-            <div class="content-grid">
-                <div class="routes-panel">
-                    <h3>Routes (<span id="routeCount">0</span>)</h3>
-                    <div id="routesList"></div>
-                </div>
-                <div class="details-panel" id="detailsPanel">
-                    <div class="empty-state">
-                        <div class="empty-icon">ℹ️</div>
-                        <p class="empty-text">Select a route to view details</p>
+            <!-- API Tester Tab -->
+            <div id="testerTab" class="tab-content">
+                <div class="tester-container">
+                    <div class="tester-form">
+                        <h3>API Request Builder</h3>
+                        
+                        <div class="form-group">
+                            <label>HTTP Method</label>
+                            <select id="testMethod" class="form-control">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="PATCH">PATCH</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Endpoint URL</label>
+                            <input type="text" id="testEndpoint" class="form-control" placeholder="/wp-json/wp/v2/posts">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Headers (JSON)</label>
+                            <textarea id="testHeaders" class="form-control code-input" rows="4" placeholder='{"Content-Type": "application/json"}'></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Request Body (JSON)</label>
+                            <textarea id="testBody" class="form-control code-input" rows="6" placeholder='{"title": "Test Post"}'></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button id="sendRequestBtn" class="primary-btn">
+                                <span class="iconify" data-icon="mdi:send"></span>
+                                Send Request
+                            </button>
+                            <button id="clearRequestBtn" class="secondary-btn">
+                                <span class="iconify" data-icon="mdi:close"></span>
+                                Clear
+                            </button>
+                            <button id="generateCodeBtn" class="secondary-btn">
+                                <span class="iconify" data-icon="mdi:code-braces"></span>
+                                Generate Code
+                            </button>
+                        </div>
                     </div>
+
+                    <div class="tester-response">
+                        <div class="response-header">
+                            <h3>Response</h3>
+                            <div class="response-actions">
+                                <button id="copyResponseBtn" class="small-btn" title="Copy Response">
+                                    <span class="iconify" data-icon="mdi:content-copy"></span>
+                                </button>
+                                <button id="formatResponseBtn" class="small-btn" title="Format JSON">
+                                    <span class="iconify" data-icon="mdi:code-json"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="responseStatus" class="response-status"></div>
+                        <div id="responseContainer" class="response-container">
+                            <div class="empty-state">
+                                <span class="iconify empty-icon" data-icon="mdi:send-circle-outline"></span>
+                                <p class="empty-text">Send a request to see the response</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="historyTab" class="tab-content">
+                <div class="history-container">
+                    <div class="history-header">
+                        <h3>Request History</h3>
+                        <button id="clearHistoryBtn" class="secondary-btn">
+                            <span class="iconify" data-icon="mdi:delete-sweep"></span>
+                            Clear History
+                        </button>
+                    </div>
+                    <div id="historyList" class="history-list">
+                        <div class="empty-state">
+                            <span class="iconify empty-icon" data-icon="mdi:history"></span>
+                            <p class="empty-text">No request history yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favorites Tab -->
+            <div id="favoritesTab" class="tab-content">
+                <div class="favorites-container">
+                    <div class="favorites-header">
+                        <h3>Favorite Routes</h3>
+                        <button id="clearFavoritesBtn" class="secondary-btn">
+                            <span class="iconify" data-icon="mdi:delete-sweep"></span>
+                            Clear All
+                        </button>
+                    </div>
+                    <div id="favoritesList" class="favorites-list">
+                        <div class="empty-state">
+                            <span class="iconify empty-icon" data-icon="mdi:star-outline"></span>
+                            <p class="empty-text">No favorite routes yet. Click the star icon on any route to add it here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentation Tab -->
+            <div id="docsTab" class="tab-content">
+                <div class="docs-container">
+                    <div class="docs-header">
+                        <h3>API Documentation</h3>
+                        <div class="docs-actions">
+                            <button id="exportDocsBtn" class="primary-btn">
+                                <span class="iconify" data-icon="mdi:file-document"></span>
+                                Export as Markdown
+                            </button>
+                            <button id="exportPostmanBtn" class="secondary-btn">
+                                <span class="iconify" data-icon="mdi:api"></span>
+                                Export Postman Collection
+                            </button>
+                        </div>
+                    </div>
+                    <div id="docsContent" class="docs-content"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        let apiData = null;
-        let searchTerm = '';
-        let filterMethod = 'ALL';
-
-        // File upload handlers
-        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
-        document.getElementById('reloadFile').addEventListener('change', handleFileUpload);
-        document.getElementById('loadUrlBtn').addEventListener('click', handleUrlLoad);
-        document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleUrlLoad();
-            }
-        });
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchTerm = e.target.value.toLowerCase();
-            renderRoutes();
-        });
-
-        async function handleUrlLoad() {
-            const urlInput = document.getElementById('urlInput');
-            const url = urlInput.value.trim();
-            const errorEl = document.getElementById('urlError');
-            const loadingEl = document.getElementById('urlLoading');
-
-            // Validate URL
-            if (!url) {
-                showError('Please enter a URL');
-                return;
-            }
-
-            // Ensure URL ends with /wp-json if not already
-            let apiUrl = url;
-            if (!apiUrl.includes('/wp-json')) {
-                apiUrl = apiUrl.replace(/\/$/, '') + '/wp-json';
-            }
-
-            // Show loading state
-            errorEl.classList.add('hidden');
-            loadingEl.classList.remove('hidden');
-            document.getElementById('loadUrlBtn').disabled = true;
-
-            try {
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                apiData = data;
-                initializeApp();
-            } catch (error) {
-                console.error('Error loading API:', error);
-                showError(`Failed to load API: ${error.message}. Make sure the URL is correct and the API is accessible.`);
-            } finally {
-                loadingEl.classList.add('hidden');
-                document.getElementById('loadUrlBtn').disabled = false;
-            }
-        }
-
-        function showError(message) {
-            const errorEl = document.getElementById('urlError');
-            errorEl.textContent = message;
-            errorEl.classList.remove('hidden');
-        }
-
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    apiData = JSON.parse(event.target.result);
-                    initializeApp();
-                } catch (error) {
-                    alert('Invalid JSON file. Please upload a valid WordPress REST API JSON.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function initializeApp() {
-            document.getElementById('uploadScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            
-            // Update header
-            document.getElementById('apiName').textContent = apiData.name || 'WordPress REST API';
-            document.getElementById('apiUrl').textContent = apiData.url || '';
-            document.getElementById('apiDescription').textContent = apiData.description || '';
-            
-            // Render stats
-            renderStats();
-            
-            // Render method filters
-            renderMethodFilters();
-            
-            // Render routes
-            renderRoutes();
-        }
-
-        function renderStats() {
-            const stats = [
-                { icon: '💾', value: Object.keys(apiData.routes || {}).length, label: 'Routes', color: 'blue' },
-                { icon: '🏷️', value: (apiData.namespaces || []).length, label: 'Namespaces', color: 'green' },
-                { icon: 'ℹ️', value: (apiData.authentication || []).length, label: 'Auth Methods', color: 'purple' },
-                { icon: '🌐', value: apiData.timezone_string || 'UTC', label: 'Timezone', color: 'orange' }
-            ];
-
-            const html = stats.map(stat => `
-                <div class="stat-card ${stat.color}">
-                    <div class="stat-icon">${stat.icon}</div>
-                    <div class="stat-value">${stat.value}</div>
-                    <div class="stat-label">${stat.label}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('statsGrid').innerHTML = html;
-        }
-
-        function renderMethodFilters() {
-            const methods = ['ALL', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
-            const html = methods.map(method => `
-                <button class="method-btn ${method === filterMethod ? 'active' : ''}" 
-                        onclick="setMethodFilter('${method}')">
-                    ${method}
+    <!-- Modals -->
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Export Data</h3>
+                <button class="close-modal">
+                    <span class="iconify" data-icon="mdi:close"></span>
                 </button>
-            `).join('');
-            document.getElementById('methodFilters').innerHTML = html;
-        }
+            </div>
+            <div class="modal-body">
+                <button class="export-option" data-format="json">
+                    <span class="iconify" data-icon="mdi:code-json"></span>
+                    <div>
+                        <strong>Export as JSON</strong>
+                        <p>Download the complete API data</p>
+                    </div>
+                </button>
+                <button class="export-option" data-format="csv">
+                    <span class="iconify" data-icon="mdi:file-delimited"></span>
+                    <div>
+                        <strong>Export as CSV</strong>
+                        <p>Routes and methods in spreadsheet format</p>
+                    </div>
+                </button>
+                <button class="export-option" data-format="markdown">
+                    <span class="iconify" data-icon="mdi:language-markdown"></span>
+                    <div>
+                        <strong>Export as Markdown</strong>
+                        <p>Human-readable documentation</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        function setMethodFilter(method) {
-            filterMethod = method;
-            renderMethodFilters();
-            renderRoutes();
-        }
-
-        function getFilteredRoutes() {
-            if (!apiData?.routes) return [];
-            
-            return Object.entries(apiData.routes).filter(([route, details]) => {
-                const matchesSearch = route.toLowerCase().includes(searchTerm);
-                const methods = details.methods || [];
-                const matchesMethod = filterMethod === 'ALL' || methods.includes(filterMethod);
-                return matchesSearch && matchesMethod;
-            });
-        }
-
-        function renderRoutes() {
-            const filteredRoutes = getFilteredRoutes();
-            document.getElementById('routeCount').textContent = filteredRoutes.length;
-
-            const html = filteredRoutes.map(([route, details]) => `
-                <div class="route-item">
-                    <button class="route-button" onclick='selectRoute(${JSON.stringify(route)})'>
-                        <div class="route-info">
-                            <code class="route-path">${route}</code>
-                            <div class="route-methods">
-                                ${(details.methods || []).slice(0, 3).map(method => 
-                                    `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-                                ).join('')}
-                            </div>
-                        </div>
-                        <span class="chevron">▶</span>
+    <!-- Code Generator Modal -->
+    <div id="codeModal" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Code Generator</h3>
+                <button class="close-modal">
+                    <span class="iconify" data-icon="mdi:close"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="code-tabs">
+                    <button class="code-tab active" data-lang="curl">cURL</button>
+                    <button class="code-tab" data-lang="javascript">JavaScript</button>
+                    <button class="code-tab" data-lang="python">Python</button>
+                    <button class="code-tab" data-lang="php">PHP</button>
+                </div>
+                <div class="code-container">
+                    <button class="copy-code-btn" title="Copy Code">
+                        <span class="iconify" data-icon="mdi:content-copy"></span>
                     </button>
+                    <pre><code id="generatedCode" class="language-bash"></code></pre>
                 </div>
-            `).join('');
+            </div>
+        </div>
+    </div>
 
-            document.getElementById('routesList').innerHTML = html || '<p style="color: #6b7280; padding: 1rem;">No routes found</p>';
-        }
-
-        function selectRoute(route) {
-            const details = apiData.routes[route];
-            renderRouteDetails(route, details);
-        }
-
-        function renderRouteDetails(route, details) {
-            const html = `
-                <div class="route-header">
-                    <h3 class="route-title">${route}</h3>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        ${(details.methods || []).map(method => 
-                            `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-                        ).join('')}
-                    </div>
-                    ${details.namespace ? `<p class="route-namespace"><strong>Namespace:</strong> ${details.namespace}</p>` : ''}
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="close-modal">
+                    <span class="iconify" data-icon="mdi:close"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="autoFormatJson">
+                        Auto-format JSON responses
+                    </label>
                 </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="saveHistory" checked>
+                        Save request history
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="showLineNumbers">
+                        Show line numbers in code
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>Request Timeout (seconds)</label>
+                    <input type="number" id="requestTimeout" value="30" min="5" max="120">
+                </div>
+            </div>
+        </div>
+    </div>
 
-                ${(details.endpoints || []).map((endpoint, idx) => `
-                    <div class="endpoint-section">
-                        <div class="endpoint-methods">
-                            ${(endpoint.methods || []).map(method => 
-                                `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-                            ).join('')}
-                        </div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
 
-                        ${endpoint.args && Object.keys(endpoint.args).length > 0 ? `
-                            <h4 class="parameters-title">Parameters:</h4>
-                            <div>
-                                ${Object.entries(endpoint.args).map(([argName, argDetails]) => `
-                                    <div class="parameter-item">
-                                        <div class="parameter-header">
-                                            <div>
-                                                <code class="parameter-name">${argName}</code>
-                                                ${argDetails.required ? '<span class="required-badge">Required</span>' : ''}
-                                            </div>
-                                            ${argDetails.type ? `<span class="parameter-type">${Array.isArray(argDetails.type) ? argDetails.type.join(' | ') : argDetails.type}</span>` : ''}
-                                        </div>
-                                        ${argDetails.description ? `<p class="parameter-description">${argDetails.description}</p>` : ''}
-                                        ${argDetails.default !== undefined ? `<p class="parameter-meta">Default: <code>${JSON.stringify(argDetails.default)}</code></p>` : ''}
-                                        ${argDetails.enum ? `<p class="parameter-meta">Values: ${argDetails.enum.map(v => `<code>${v}</code>`).join(', ')}</p>` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `).join('')}
-            `;
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
 
-            document.getElementById('detailsPanel').innerHTML = html;
-        }
-    </script>
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
