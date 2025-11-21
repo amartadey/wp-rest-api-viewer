@@ -5,79 +5,453 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WordPress REST API Explorer (Enhanced)</title>
     <style>
-        /* --- Existing Styles (omitted for brevity, assume they are present) --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%); min-height: 100vh; padding: 1rem; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .upload-screen { max-width: 600px; margin: 100px auto; background: white; padding: 3rem; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.15); text-align: center; }
-        .upload-icon { width: 80px; height: 80px; margin: 0 auto 2rem; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; }
-        h1 { font-size: 2.5rem; color: #1f2937; margin-bottom: 1rem; }
-        .upload-description { color: #6b7280; margin-bottom: 2rem; line-height: 1.6; }
-        .upload-btn { background: #3b82f6; color: white; padding: 1rem 2rem; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
-        .upload-btn:hover { background: #2563eb; }
-        .hidden { display: none !important; }
-        .header { background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
-        .header-title { display: flex; align-items: center; gap: 0.5rem; }
-        .header-title h2 { font-size: 1.875rem; color: #1f2937; }
-        .header-url { color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem; }
-        .reload-btn { background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem; transition: background 0.3s; }
-        .reload-btn:hover { background: #4b5563; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .stat-card { padding: 1rem; border-radius: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .upload-screen {
+            max-width: 600px;
+            margin: 100px auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .upload-description {
+            color: #6b7280;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .upload-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-btn:hover {
+            background: #2563eb;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title h2 {
+            font-size: 1.875rem;
+            color: #1f2937;
+        }
+
+        .header-url {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .reload-btn {
+            background: #6b7280;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.3s;
+        }
+
+        .reload-btn:hover {
+            background: #4b5563;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
         .stat-card.blue { background: #dbeafe; }
         .stat-card.green { background: #d1fae5; }
         .stat-card.purple { background: #e9d5ff; }
         .stat-card.orange { background: #fed7aa; }
-        .stat-icon { font-size: 1.5rem; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: #1f2937; }
-        .stat-label { font-size: 0.875rem; color: #6b7280; }
-        .filters { background: white; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .filters-content { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
-        .search-box { flex: 1; min-width: 200px; position: relative; }
-        .search-box input { width: 100%; padding: 0.5rem 0.5rem 0.5rem 2.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; transition: all 0.3s; }
-        .search-box input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #9ca3af; }
-        .method-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .method-btn { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s; background: #e5e7eb; color: #374151; }
-        .method-btn:hover { background: #d1d5db; }
-        .method-btn.active { background: #3b82f6; color: white; }
-        .content-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; }
-        @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
-        .routes-panel { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1rem; max-height: calc(100vh - 400px); overflow-y: auto; }
-        .routes-panel h3 { font-size: 1.25rem; color: #1f2937; margin-bottom: 1rem; }
-        .route-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 0.5rem; overflow: hidden; }
-        .route-button { width: 100%; text-align: left; padding: 0.75rem; border: none; background: white; cursor: pointer; transition: background 0.3s; display: flex; justify-content: space-between; align-items: center; }
-        .route-button:hover { background: #f9fafb; }
-        .route-info { flex: 1; min-width: 0; }
-        .route-path { font-family: 'Courier New', monospace; color: #2563eb; font-size: 0.875rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
-        .route-methods { display: flex; gap: 0.25rem; margin-top: 0.25rem; flex-wrap: wrap; }
-        .method-badge { font-size: 0.75rem; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-weight: 600; color: white; }
+
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .filters {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .filters-content {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 0.5rem 0.5rem 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .method-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .method-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .method-btn:hover {
+            background: #d1d5db;
+        }
+
+        .method-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .routes-panel {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+        }
+
+        .routes-panel h3 {
+            font-size: 1.25rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .route-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .route-button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem;
+            border: none;
+            background: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .route-button:hover {
+            background: #f9fafb;
+        }
+
+        .route-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .route-path {
+            font-family: 'Courier New', monospace;
+            color: #2563eb;
+            font-size: 0.875rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+        .route-methods {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .method-badge {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            color: white;
+        }
+
         .method-badge.get { background: #3b82f6; }
         .method-badge.post { background: #10b981; }
         .method-badge.put { background: #eab308; }
         .method-badge.patch { background: #f97316; }
         .method-badge.delete { background: #ef4444; }
-        .chevron { color: #9ca3af; transition: transform 0.3s; }
-        .details-panel { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; max-height: calc(100vh - 400px); overflow-y: auto; }
-        .empty-state { text-align: center; padding: 3rem; }
-        .empty-icon { font-size: 4rem; color: #d1d5db; margin-bottom: 1rem; }
-        .empty-text { color: #6b7280; }
-        .route-header { border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem; margin-bottom: 1.5rem; }
-        .route-title { font-size: 1.5rem; color: #1f2937; margin-bottom: 0.5rem; word-break: break-all; display: flex; justify-content: space-between; align-items: center;} /* Modified for copy button */
-        .route-namespace { font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem; }
-        .endpoint-section { background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; }
-        .endpoint-methods { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .endpoint-methods .method-badge { font-size: 0.875rem; padding: 0.25rem 0.5rem; }
-        .parameters-title { font-weight: 600; color: #374151; margin-bottom: 0.75rem; }
-        .parameter-item { background: white; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #e5e7eb; margin-bottom: 0.5rem; }
-        .parameter-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; }
-        .parameter-name { font-family: 'Courier New', monospace; color: #2563eb; font-size: 0.875rem; }
-        .required-badge { background: #fee2e2; color: #991b1b; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 0.25rem; margin-left: 0.5rem; }
-        .parameter-type { color: #6b7280; font-size: 0.75rem; }
-        .parameter-description { color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem; }
-        .parameter-meta { font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem; }
-        .parameter-meta code { background: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.75rem; }
+
+        .chevron {
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .details-panel {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+        }
+
+        .empty-text {
+            color: #6b7280;
+        }
+
+        .route-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .route-title {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+
+        .route-namespace {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .endpoint-section {
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .endpoint-methods {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .endpoint-methods .method-badge {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .parameters-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+        }
+
+        .parameter-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .parameter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .parameter-name {
+            font-family: 'Courier New', monospace;
+            color: #2563eb;
+            font-size: 0.875rem;
+        }
+
+        .required-badge {
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+        }
+
+        .parameter-type {
+            color: #6b7280;
+            font-size: 0.75rem;
+        }
+
+        .parameter-description {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .parameter-meta {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .parameter-meta code {
+            background: #f3f4f6;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
         
         /* --- NEW STYLES for Functionality --- */
         .filter-select {
@@ -102,7 +476,7 @@
             color: #6b7280;
             transition: color 0.3s;
             border-bottom: 3px solid transparent;
-            margin-bottom: -1px; /* To hide the bottom border of the details panel */
+            margin-bottom: -1px; 
         }
         .tab-btn.active {
             color: #3b82f6;
@@ -209,7 +583,7 @@
                 <button id="loadUrlBtn" class="upload-btn" style="width: 100%;">
                     🌐 Load from URL
                 </button>
-                <p id="urlError" class="hidden" style="color: #ef4444; margin-top: 0.5rem; font-size: 0.875rem;"></p>
+                <p id="urlError" class="hidden" style="color: #ef4444; margin-top: 0.5rem; font-size: 0.875rem;">Loading</p>
                 <p id="urlLoading" class="hidden" style="color: #3b82f6; margin-top: 0.5rem; font-size: 0.875rem;">
                     ⏳ Loading API data...
                 </p>
@@ -375,7 +749,6 @@
             document.getElementById('detailsPanel').innerHTML = `<div class="empty-state"><div class="empty-icon">ℹ️</div><p class="empty-text">Select a route to view details or test the endpoint</p></div>`;
         }
 
-        // --- Stats Rendering (as before) ---
         function renderStats() {
             const routesCount = Object.keys(apiData.routes || {}).length;
             const stats = [
@@ -396,7 +769,6 @@
             document.getElementById('statsGrid').innerHTML = html;
         }
 
-        // --- Method Filtering (as before) ---
         function renderMethodFilters() {
             const methods = ['ALL', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
             const html = methods.map(method => `
@@ -415,7 +787,6 @@
             renderRoutes();
         }
 
-        // --- NEW: Namespace Filtering ---
         function renderNamespaceFilter() {
             const namespaces = ['ALL', ...(apiData.namespaces || [])];
             const selectEl = document.getElementById('namespaceFilter');
@@ -429,8 +800,6 @@
             selectEl.innerHTML = options;
         }
 
-
-        // --- Route Filtering and Rendering (Enhanced with pagination and namespace filter) ---
         function getFilteredRoutes() {
             if (!apiData?.routes) return [];
             
@@ -446,7 +815,15 @@
             
             return filtered;
         }
+        
+        // --- NEW HELPER FUNCTION TO SAFELY HANDLE ROUTE SELECTION ---
+        function handleRouteSelection(buttonElement) {
+            // Retrieve and un-escape the path stored in the data attribute
+            const route = buttonElement.getAttribute('data-route-path').replace(/&apos;/g, "'"); 
+            selectRoute(route);
+        }
 
+        // --- RENDER ROUTES (FIXED) ---
         function renderRoutes() {
             const filteredRoutes = getFilteredRoutes();
             const routesToShow = filteredRoutes.slice(0, routeLimit);
@@ -454,21 +831,26 @@
             document.getElementById('routeCount').textContent = routesToShow.length;
             document.getElementById('totalRouteCount').textContent = filteredRoutes.length;
 
-            const html = routesToShow.map(([route, details]) => `
-                <div class="route-item" id="route-item-${btoa(route).replace(/=/g, '')}">
-                    <button class="route-button" onclick="selectRoute('${route.replace(/'/g, "\\'")}')">
-                        <div class="route-info">
-                            <code class="route-path">${route}</code>
-                            <div class="route-methods">
-                                ${(details.methods || []).slice(0, 3).map(method => 
-                                    `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-                                ).join('')}
+            const html = routesToShow.map(([route, details]) => {
+                // Safely escape single quotes for embedding in a data attribute
+                const safeRoutePath = route.replace(/'/g, "&apos;"); 
+
+                return `
+                    <div class="route-item" id="route-item-${btoa(route).replace(/=/g, '')}">
+                        <button class="route-button" data-route-path="${safeRoutePath}" onclick="handleRouteSelection(this)">
+                            <div class="route-info">
+                                <code class="route-path">${route}</code>
+                                <div class="route-methods">
+                                    ${(details.methods || []).slice(0, 3).map(method => 
+                                        `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
+                                    ).join('')}
+                                </div>
                             </div>
-                        </div>
-                        <span class="chevron">▶</span>
-                    </button>
-                </div>
-            `).join('');
+                            <span class="chevron">▶</span>
+                        </button>
+                    </div>
+                `;
+            }).join('');
 
             document.getElementById('routesList').innerHTML = html || '<p style="color: #6b7280; padding: 1rem;">No routes found</p>';
 
@@ -491,7 +873,6 @@
             }
         }
 
-        // --- Route Selection and Details Rendering (Enhanced with Tabs) ---
         function selectRoute(route) {
             currentRoute = route;
             renderRoutes(); // Re-render to highlight selected route
@@ -524,7 +905,6 @@
 
             panel.innerHTML = tabsHtml + contentHtml;
         }
-
 
         function renderDocumentation(route, details) {
             // Check if route has path parameters (e.g., /(?P<id>[\d]+))
@@ -642,7 +1022,7 @@
             return html;
         }
 
-        // --- NEW: API Testing Logic ---
+        // --- API Testing Logic ---
         async function sendApiRequest() {
             const method = document.getElementById('testMethod').value;
             const url = document.getElementById('testUrl').value;
