@@ -5,7 +5,6 @@ let filterMethod = 'ALL';
 let filterNamespace = 'ALL';
 let requestHistory = [];
 let favorites = [];
-let docsViewMode = 'rendered'; // 'rendered' or 'code'
 let settings = {
     autoFormatJson: true,
     saveHistory: true,
@@ -27,58 +26,58 @@ function initializeEventListeners() {
     // File upload
     document.getElementById('fileInput').addEventListener('change', handleFileUpload);
     document.getElementById('reloadFile').addEventListener('change', handleFileUpload);
-
+    
     // URL loading
     document.getElementById('loadUrlBtn').addEventListener('click', handleUrlLoad);
     document.getElementById('urlInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleUrlLoad();
     });
-
+    
     // Demo
     document.getElementById('loadDemoBtn').addEventListener('click', loadDemoAPI);
-
+    
     // Search and filters
     document.getElementById('searchInput').addEventListener('input', (e) => {
         searchTerm = e.target.value.toLowerCase();
         renderRoutes();
     });
-
+    
     document.getElementById('namespaceFilter').addEventListener('change', (e) => {
         filterNamespace = e.target.value;
         renderRoutes();
     });
-
+    
     // Theme toggle
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
+    
     // Export
     document.getElementById('exportBtn').addEventListener('click', () => showModal('exportModal'));
-
+    
     // Settings
     document.getElementById('settingsBtn').addEventListener('click', () => showModal('settingsModal'));
-
+    
     // Tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
-
+    
     // API Tester
     document.getElementById('sendRequestBtn').addEventListener('click', sendAPIRequest);
     document.getElementById('clearRequestBtn').addEventListener('click', clearRequestForm);
     document.getElementById('generateCodeBtn').addEventListener('click', () => showModal('codeModal'));
     document.getElementById('copyResponseBtn').addEventListener('click', copyResponse);
     document.getElementById('formatResponseBtn').addEventListener('click', formatResponse);
-
+    
     // History
     document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
-
+    
     // Favorites
     document.getElementById('clearFavoritesBtn').addEventListener('click', clearFavorites);
-
+    
     // Documentation
     document.getElementById('exportDocsBtn').addEventListener('click', () => exportData('markdown'));
     document.getElementById('exportPostmanBtn').addEventListener('click', exportPostmanCollection);
-
+    
     // Export modal
     document.querySelectorAll('.export-option').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -86,7 +85,7 @@ function initializeEventListeners() {
             hideModal('exportModal');
         });
     });
-
+    
     // Code generator tabs
     document.querySelectorAll('.code-tab').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -95,17 +94,17 @@ function initializeEventListeners() {
             generateCode(btn.dataset.lang);
         });
     });
-
+    
     // Copy code
     document.querySelector('.copy-code-btn').addEventListener('click', copyGeneratedCode);
-
+    
     // Close modals
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', () => {
             btn.closest('.modal').classList.add('hidden');
         });
     });
-
+    
     // Click outside modal to close
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
@@ -114,34 +113,34 @@ function initializeEventListeners() {
             }
         });
     });
-
+    
     // Settings
     document.getElementById('autoFormatJson').addEventListener('change', (e) => {
         settings.autoFormatJson = e.target.checked;
         saveSettings();
     });
-
+    
     document.getElementById('saveHistory').addEventListener('change', (e) => {
         settings.saveHistory = e.target.checked;
         saveSettings();
     });
-
+    
     document.getElementById('showLineNumbers').addEventListener('change', (e) => {
         settings.showLineNumbers = e.target.checked;
         saveSettings();
     });
-
+    
     document.getElementById('requestTimeout').addEventListener('change', (e) => {
         settings.requestTimeout = parseInt(e.target.value);
         saveSettings();
     });
-
+    
     // Panel actions
     document.getElementById('expandAllBtn')?.addEventListener('click', () => {
         // Expand all routes - future implementation
         showToast('Feature coming soon!', 'info');
     });
-
+    
     document.getElementById('collapseAllBtn')?.addEventListener('click', () => {
         // Collapse all routes - future implementation
         showToast('Feature coming soon!', 'info');
@@ -189,7 +188,7 @@ async function handleUrlLoad() {
 
     try {
         const response = await fetch(apiUrl);
-
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -304,7 +303,7 @@ function loadDemoAPI() {
             }
         }
     };
-
+    
     initializeApp();
     showToast('Demo API loaded successfully!', 'success');
 }
@@ -313,11 +312,11 @@ function loadDemoAPI() {
 function initializeApp() {
     document.getElementById('uploadScreen').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
-
+    
     document.getElementById('apiName').textContent = apiData.name || 'WordPress REST API';
     document.getElementById('apiUrl').textContent = apiData.url || '';
     document.getElementById('apiDescription').textContent = apiData.description || '';
-
+    
     renderStats();
     renderNamespaceFilter();
     renderMethodFilters();
@@ -331,7 +330,7 @@ function renderStats() {
     const namespaceCount = (apiData.namespaces || []).length;
     const authCount = (apiData.authentication || []).length;
     const timezone = apiData.timezone_string || 'UTC';
-
+    
     // Count methods
     const methodCounts = {};
     Object.values(apiData.routes || {}).forEach(route => {
@@ -339,7 +338,7 @@ function renderStats() {
             methodCounts[method] = (methodCounts[method] || 0) + 1;
         });
     });
-
+    
     const stats = [
         { icon: 'mdi:routes', value: routeCount, label: 'Routes', color: 'blue' },
         { icon: 'mdi:folder-network', value: namespaceCount, label: 'Namespaces', color: 'green' },
@@ -364,12 +363,12 @@ function renderStats() {
 function renderNamespaceFilter() {
     const namespaces = apiData.namespaces || [];
     const select = document.getElementById('namespaceFilter');
-
+    
     const options = ['<option value="ALL">All Namespaces</option>'];
     namespaces.forEach(ns => {
         options.push(`<option value="${ns}">${ns}</option>`);
     });
-
+    
     select.innerHTML = options.join('');
 }
 
@@ -394,7 +393,7 @@ function setMethodFilter(method) {
 // ===== Routes =====
 function getFilteredRoutes() {
     if (!apiData?.routes) return [];
-
+    
     return Object.entries(apiData.routes).filter(([route, details]) => {
         const matchesSearch = route.toLowerCase().includes(searchTerm);
         const methods = details.methods || [];
@@ -416,9 +415,9 @@ function renderRoutes() {
                 <div class="route-info">
                     <code class="route-path">${route}</code>
                     <div class="route-methods">
-                        ${(details.methods || []).slice(0, 5).map(method =>
-            `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-        ).join('')}
+                        ${(details.methods || []).slice(0, 5).map(method => 
+                            `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
+                        ).join('')}
                     </div>
                 </div>
                 <div class="route-actions">
@@ -439,7 +438,7 @@ function renderRoutes() {
 function selectRoute(route) {
     const details = apiData.routes[route];
     renderRouteDetails(route, details);
-
+    
     // Pre-fill API tester
     document.getElementById('testEndpoint').value = route;
     if (details.methods && details.methods.length > 0) {
@@ -452,9 +451,9 @@ function renderRouteDetails(route, details) {
         <div class="route-header">
             <h3 class="route-title">${route}</h3>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
-                ${(details.methods || []).map(method =>
-        `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-    ).join('')}
+                ${(details.methods || []).map(method => 
+                    `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
+                ).join('')}
             </div>
             ${details.namespace ? `<p class="route-namespace"><strong>Namespace:</strong> ${details.namespace}</p>` : ''}
         </div>
@@ -462,9 +461,9 @@ function renderRouteDetails(route, details) {
         ${(details.endpoints || []).map((endpoint, idx) => `
             <div class="endpoint-section">
                 <div class="endpoint-methods">
-                    ${(endpoint.methods || []).map(method =>
-        `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-    ).join('')}
+                    ${(endpoint.methods || []).map(method => 
+                        `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
+                    ).join('')}
                 </div>
 
                 ${endpoint.args && Object.keys(endpoint.args).length > 0 ? `
@@ -511,7 +510,7 @@ function toggleFavorite(route) {
 
 function renderFavorites() {
     const container = document.getElementById('favoritesList');
-
+    
     if (favorites.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -521,20 +520,20 @@ function renderFavorites() {
         `;
         return;
     }
-
+    
     const html = favorites.map(route => {
         const details = apiData.routes[route];
         if (!details) return '';
-
+        
         return `
             <div class="favorite-item">
                 <div class="favorite-item-header">
                     <div>
                         <code class="history-item-url">${route}</code>
                         <div class="route-methods">
-                            ${(details.methods || []).map(method =>
-            `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
-        ).join('')}
+                            ${(details.methods || []).map(method => 
+                                `<span class="method-badge ${method.toLowerCase()}">${method}</span>`
+                            ).join('')}
                         </div>
                     </div>
                     <div class="favorite-item-actions">
@@ -549,7 +548,7 @@ function renderFavorites() {
             </div>
         `;
     }).join('');
-
+    
     container.innerHTML = html;
 }
 
@@ -570,12 +569,12 @@ async function sendAPIRequest() {
     const endpoint = document.getElementById('testEndpoint').value.trim();
     const headersText = document.getElementById('testHeaders').value.trim();
     const bodyText = document.getElementById('testBody').value.trim();
-
+    
     if (!endpoint) {
         showToast('Please enter an endpoint URL', 'error');
         return;
     }
-
+    
     let headers = {};
     if (headersText) {
         try {
@@ -585,7 +584,7 @@ async function sendAPIRequest() {
             return;
         }
     }
-
+    
     let body = null;
     if (bodyText && ['POST', 'PUT', 'PATCH'].includes(method)) {
         try {
@@ -595,20 +594,20 @@ async function sendAPIRequest() {
             return;
         }
     }
-
+    
     const statusEl = document.getElementById('responseStatus');
     const containerEl = document.getElementById('responseContainer');
-
+    
     statusEl.textContent = 'Sending request...';
     statusEl.className = 'response-status';
     statusEl.style.display = 'block';
-
+    
     const startTime = Date.now();
-
+    
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), settings.requestTimeout * 1000);
-
+        
         const response = await fetch(endpoint, {
             method,
             headers: {
@@ -618,22 +617,22 @@ async function sendAPIRequest() {
             body: body ? JSON.stringify(body) : undefined,
             signal: controller.signal
         });
-
+        
         clearTimeout(timeout);
-
+        
         const duration = Date.now() - startTime;
         const responseData = await response.json();
-
+        
         statusEl.textContent = `Status: ${response.status} ${response.statusText} • ${duration}ms`;
         statusEl.className = `response-status ${response.ok ? 'success' : 'error'}`;
-
+        
         const formattedJson = JSON.stringify(responseData, null, 2);
         containerEl.innerHTML = `<pre><code class="language-json">${escapeHtml(formattedJson)}</code></pre>`;
-
+        
         if (window.Prism) {
             Prism.highlightAll();
         }
-
+        
         // Save to history
         if (settings.saveHistory) {
             addToHistory({
@@ -644,9 +643,9 @@ async function sendAPIRequest() {
                 duration
             });
         }
-
+        
         showToast('Request completed', 'success');
-
+        
     } catch (error) {
         const duration = Date.now() - startTime;
         statusEl.textContent = `Error: ${error.message} • ${duration}ms`;
@@ -708,7 +707,7 @@ function addToHistory(item) {
 
 function renderHistory() {
     const container = document.getElementById('historyList');
-
+    
     if (requestHistory.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -718,7 +717,7 @@ function renderHistory() {
         `;
         return;
     }
-
+    
     const html = requestHistory.map((item, index) => `
         <div class="history-item">
             <div class="history-item-header">
@@ -740,7 +739,7 @@ function renderHistory() {
             </div>
         </div>
     `).join('');
-
+    
     container.innerHTML = html;
 }
 
@@ -775,20 +774,20 @@ function generateCode(lang) {
     const endpoint = document.getElementById('testEndpoint').value;
     const headersText = document.getElementById('testHeaders').value.trim();
     const bodyText = document.getElementById('testBody').value.trim();
-
+    
     let headers = {};
     try {
         if (headersText) headers = JSON.parse(headersText);
-    } catch (e) { }
-
+    } catch (e) {}
+    
     let body = null;
     try {
         if (bodyText) body = JSON.parse(bodyText);
-    } catch (e) { }
-
+    } catch (e) {}
+    
     const codeEl = document.getElementById('generatedCode');
     let code = '';
-
+    
     switch (lang) {
         case 'curl':
             code = generateCurl(method, endpoint, headers, body);
@@ -807,7 +806,7 @@ function generateCode(lang) {
             codeEl.className = 'language-php';
             break;
     }
-
+    
     codeEl.textContent = code;
     if (window.Prism) {
         Prism.highlightAll();
@@ -816,15 +815,15 @@ function generateCode(lang) {
 
 function generateCurl(method, endpoint, headers, body) {
     let code = `curl -X ${method} '${endpoint}'`;
-
+    
     Object.entries(headers).forEach(([key, value]) => {
         code += ` \\\n  -H '${key}: ${value}'`;
     });
-
+    
     if (body) {
         code += ` \\\n  -d '${JSON.stringify(body)}'`;
     }
-
+    
     return code;
 }
 
@@ -874,42 +873,83 @@ function copyGeneratedCode() {
     const code = document.getElementById('generatedCode').textContent;
     copyToClipboard(code);
     showToast('Code copied to clipboard', 'success');
+}
 
+// ===== Documentation =====
+function generateDocumentation() {
+    if (!apiData) return;
+    
+    let markdown = `# ${apiData.name || 'WordPress REST API'}\n\n`;
+    markdown += `${apiData.description || ''}\n\n`;
+    markdown += `**Base URL:** ${apiData.url || ''}\n\n`;
+    markdown += `## Namespaces\n\n`;
+    
+    (apiData.namespaces || []).forEach(ns => {
+        markdown += `- ${ns}\n`;
+    });
+    
+    markdown += `\n## Endpoints\n\n`;
+    
+    Object.entries(apiData.routes || {}).forEach(([route, details]) => {
+        markdown += `### ${route}\n\n`;
+        markdown += `**Methods:** ${(details.methods || []).join(', ')}\n\n`;
+        markdown += `**Namespace:** ${details.namespace || 'N/A'}\n\n`;
+        
+        (details.endpoints || []).forEach(endpoint => {
+            if (endpoint.args && Object.keys(endpoint.args).length > 0) {
+                markdown += `**Parameters:**\n\n`;
+                Object.entries(endpoint.args).forEach(([name, arg]) => {
+                    markdown += `- \`${name}\`${arg.required ? ' (required)' : ''}: ${arg.description || ''}\n`;
+                });
+                markdown += '\n';
+            }
+        });
+        
+        markdown += '---\n\n';
+    });
+    
+    document.getElementById('docsContent').innerHTML = `<pre>${escapeHtml(markdown)}</pre>`;
+}
+
+// ===== Export =====
+function exportData(format) {
+    if (!apiData) return;
+    
     let content, filename, mimeType;
-
+    
     switch (format) {
         case 'json':
             content = JSON.stringify(apiData, null, 2);
             filename = 'wordpress-api.json';
             mimeType = 'application/json';
             break;
-
+            
         case 'csv':
             content = generateCSV();
             filename = 'wordpress-api-routes.csv';
             mimeType = 'text/csv';
             break;
-
+            
         case 'markdown':
             content = document.getElementById('docsContent').textContent;
             filename = 'wordpress-api-docs.md';
             mimeType = 'text/markdown';
             break;
     }
-
+    
     downloadFile(content, filename, mimeType);
     showToast(`Exported as ${format.toUpperCase()}`, 'success');
 }
 
 function generateCSV() {
     let csv = 'Route,Methods,Namespace\n';
-
+    
     Object.entries(apiData.routes || {}).forEach(([route, details]) => {
         const methods = (details.methods || []).join(';');
         const namespace = details.namespace || '';
         csv += `"${route}","${methods}","${namespace}"\n`;
     });
-
+    
     return csv;
 }
 
@@ -922,7 +962,7 @@ function exportPostmanCollection() {
         },
         item: []
     };
-
+    
     Object.entries(apiData.routes || {}).forEach(([route, details]) => {
         (details.methods || []).forEach(method => {
             collection.item.push({
@@ -939,7 +979,7 @@ function exportPostmanCollection() {
             });
         });
     });
-
+    
     const content = JSON.stringify(collection, null, 2);
     downloadFile(content, 'wordpress-api-postman.json', 'application/json');
     showToast('Postman collection exported', 'success');
@@ -963,11 +1003,11 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
-
+    
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.toggle('active', content.id === `${tabName}Tab`);
     });
-
+    
     // Render content when switching to certain tabs
     if (tabName === 'history') {
         renderHistory();
@@ -979,7 +1019,7 @@ function switchTab(tabName) {
 // ===== Modals =====
 function showModal(modalId) {
     document.getElementById(modalId).classList.remove('hidden');
-
+    
     if (modalId === 'codeModal') {
         generateCode('curl');
     }
@@ -1044,7 +1084,7 @@ function showToast(message, type = 'info') {
     toast.textContent = message;
     toast.className = `toast ${type}`;
     toast.classList.remove('hidden');
-
+    
     setTimeout(() => {
         toast.classList.add('hidden');
     }, 3000);
@@ -1081,13 +1121,13 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         document.getElementById('searchInput').focus();
     }
-
+    
     // Ctrl/Cmd + /: Toggle theme
     if ((e.ctrlKey || e.metaKey) && e.key === '/') {
         e.preventDefault();
         toggleTheme();
     }
-
+    
     // Escape: Close modals
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal').forEach(modal => {
