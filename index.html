@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Advanced WordPress REST API Explorer - Test, explore, and document WordPress REST APIs with ease">
+    <meta name="description"
+        content="Advanced WordPress REST API Explorer - Test, explore, and document WordPress REST APIs with ease">
     <meta name="keywords" content="WordPress, REST API, API Explorer, API Testing, WordPress Development">
     <title>WordPress REST API Explorer Pro</title>
-    
+
     <!-- Iconify Icons -->
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-    
+
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <!-- Prism.js for syntax highlighting -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <!-- Upload Screen -->
@@ -25,9 +31,10 @@
             </div>
             <h1>WordPress REST API Explorer Pro</h1>
             <p class="upload-description">
-                Upload your WordPress REST API JSON file or load it directly from a URL to explore, test, and document all available endpoints.
+                Upload your WordPress REST API JSON file or load it directly from a URL to explore, test, and document
+                all available endpoints.
             </p>
-            
+
             <div class="upload-options">
                 <label for="fileInput" class="upload-btn">
                     <span class="iconify" data-icon="mdi:file-upload"></span>
@@ -41,12 +48,7 @@
             </div>
 
             <div class="url-input-section">
-                <input 
-                    type="url" 
-                    id="urlInput" 
-                    placeholder="https://example.com/wp-json"
-                    class="url-input"
-                >
+                <input type="url" id="urlInput" placeholder="https://example.com/wp-json" class="url-input">
                 <button id="loadUrlBtn" class="upload-btn">
                     <span class="iconify" data-icon="mdi:web"></span>
                     Load from URL
@@ -171,7 +173,7 @@
                 <div class="tester-container">
                     <div class="tester-form">
                         <h3>API Request Builder</h3>
-                        
+
                         <div class="form-group">
                             <label>HTTP Method</label>
                             <select id="testMethod" class="form-control">
@@ -185,17 +187,20 @@
 
                         <div class="form-group">
                             <label>Endpoint URL</label>
-                            <input type="text" id="testEndpoint" class="form-control" placeholder="/wp-json/wp/v2/posts">
+                            <input type="text" id="testEndpoint" class="form-control"
+                                placeholder="/wp-json/wp/v2/posts">
                         </div>
 
                         <div class="form-group">
                             <label>Headers (JSON)</label>
-                            <textarea id="testHeaders" class="form-control code-input" rows="4" placeholder='{"Content-Type": "application/json"}'></textarea>
+                            <textarea id="testHeaders" class="form-control code-input" rows="4"
+                                placeholder='{"Content-Type": "application/json"}'></textarea>
                         </div>
 
                         <div class="form-group">
                             <label>Request Body (JSON)</label>
-                            <textarea id="testBody" class="form-control code-input" rows="6" placeholder='{"title": "Test Post"}'></textarea>
+                            <textarea id="testBody" class="form-control code-input" rows="6"
+                                placeholder='{"title": "Test Post"}'></textarea>
                         </div>
 
                         <div class="form-actions">
@@ -269,144 +274,124 @@
                     <div id="favoritesList" class="favorites-list">
                         <div class="empty-state">
                             <span class="iconify empty-icon" data-icon="mdi:star-outline"></span>
-                            <p class="empty-text">No favorite routes yet. Click the star icon on any route to add it here.</p>
+                            <p class="empty-text">No favorite routes yet. Click the star icon on any route to add it
+                                here.</p>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Documentation Tab -->
-            <div id="docsTab" class="tab-content">
-                <div class="docs-container">
-                    <div class="docs-header">
-                        <h3>API Documentation</h3>
-                        <div class="docs-actions">
-                            <button id="exportDocsBtn" class="primary-btn">
-                                <span class="iconify" data-icon="mdi:file-document"></span>
-                                Export as Markdown
+                <!-- Modals -->
+                <!-- Export Modal -->
+                <div id="exportModal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Export Data</h3>
+                            <button class="close-modal">
+                                <span class="iconify" data-icon="mdi:close"></span>
                             </button>
-                            <button id="exportPostmanBtn" class="secondary-btn">
-                                <span class="iconify" data-icon="mdi:api"></span>
-                                Export Postman Collection
+                        </div>
+                        <div class="modal-body">
+                            <button class="export-option" data-format="json">
+                                <span class="iconify" data-icon="mdi:code-json"></span>
+                                <div>
+                                    <strong>Export as JSON</strong>
+                                    <p>Download the complete API data</p>
+                                </div>
+                            </button>
+                            <button class="export-option" data-format="csv">
+                                <span class="iconify" data-icon="mdi:file-delimited"></span>
+                                <div>
+                                    <strong>Export as CSV</strong>
+                                    <p>Routes and methods in spreadsheet format</p>
+                                </div>
+                            </button>
+                            <button class="export-option" data-format="markdown">
+                                <span class="iconify" data-icon="mdi:language-markdown"></span>
+                                <div>
+                                    <strong>Export as Markdown</strong>
+                                    <p>Human-readable documentation</p>
+                                </div>
                             </button>
                         </div>
                     </div>
-                    <div id="docsContent" class="docs-content"></div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modals -->
-    <!-- Export Modal -->
-    <div id="exportModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Export Data</h3>
-                <button class="close-modal">
-                    <span class="iconify" data-icon="mdi:close"></span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <button class="export-option" data-format="json">
-                    <span class="iconify" data-icon="mdi:code-json"></span>
-                    <div>
-                        <strong>Export as JSON</strong>
-                        <p>Download the complete API data</p>
+                <!-- Code Generator Modal -->
+                <div id="codeModal" class="modal hidden">
+                    <div class="modal-content large">
+                        <div class="modal-header">
+                            <h3>Code Generator</h3>
+                            <button class="close-modal">
+                                <span class="iconify" data-icon="mdi:close"></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="code-tabs">
+                                <button class="code-tab active" data-lang="curl">cURL</button>
+                                <button class="code-tab" data-lang="javascript">JavaScript</button>
+                                <button class="code-tab" data-lang="python">Python</button>
+                                <button class="code-tab" data-lang="php">PHP</button>
+                            </div>
+                            <div class="code-container">
+                                <button class="copy-code-btn" title="Copy Code">
+                                    <span class="iconify" data-icon="mdi:content-copy"></span>
+                                </button>
+                                <pre><code id="generatedCode" class="language-bash"></code></pre>
+                            </div>
+                        </div>
                     </div>
-                </button>
-                <button class="export-option" data-format="csv">
-                    <span class="iconify" data-icon="mdi:file-delimited"></span>
-                    <div>
-                        <strong>Export as CSV</strong>
-                        <p>Routes and methods in spreadsheet format</p>
+                </div>
+
+                <!-- Settings Modal -->
+                <div id="settingsModal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Settings</h3>
+                            <button class="close-modal">
+                                <span class="iconify" data-icon="mdi:close"></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="autoFormatJson">
+                                    Auto-format JSON responses
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="saveHistory" checked>
+                                    Save request history
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="showLineNumbers">
+                                    Show line numbers in code
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>Request Timeout (seconds)</label>
+                                <input type="number" id="requestTimeout" value="30" min="5" max="120">
+                            </div>
+                        </div>
                     </div>
-                </button>
-                <button class="export-option" data-format="markdown">
-                    <span class="iconify" data-icon="mdi:language-markdown"></span>
-                    <div>
-                        <strong>Export as Markdown</strong>
-                        <p>Human-readable documentation</p>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
+                </div>
 
-    <!-- Code Generator Modal -->
-    <div id="codeModal" class="modal hidden">
-        <div class="modal-content large">
-            <div class="modal-header">
-                <h3>Code Generator</h3>
-                <button class="close-modal">
-                    <span class="iconify" data-icon="mdi:close"></span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="code-tabs">
-                    <button class="code-tab active" data-lang="curl">cURL</button>
-                    <button class="code-tab" data-lang="javascript">JavaScript</button>
-                    <button class="code-tab" data-lang="python">Python</button>
-                    <button class="code-tab" data-lang="php">PHP</button>
-                </div>
-                <div class="code-container">
-                    <button class="copy-code-btn" title="Copy Code">
-                        <span class="iconify" data-icon="mdi:content-copy"></span>
-                    </button>
-                    <pre><code id="generatedCode" class="language-bash"></code></pre>
-                </div>
-            </div>
-        </div>
-    </div>
+                <!-- Toast Notification -->
+                <div id="toast" class="toast hidden"></div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Settings</h3>
-                <button class="close-modal">
-                    <span class="iconify" data-icon="mdi:close"></span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" id="autoFormatJson">
-                        Auto-format JSON responses
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" id="saveHistory" checked>
-                        Save request history
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" id="showLineNumbers">
-                        Show line numbers in code
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <label>Request Timeout (seconds)</label>
-                    <input type="number" id="requestTimeout" value="30" min="5" max="120">
-                </div>
-            </div>
-        </div>
-    </div>
+                <!-- Prism.js -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+                <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+                <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden"></div>
-
-    <!-- Prism.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-
-    <!-- Custom JavaScript -->
-    <script src="script.js"></script>
+                <!-- Custom JavaScript -->
+                <script src="script.js"></script>
 </body>
+
 </html>
