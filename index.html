@@ -458,12 +458,37 @@
             <div class="upload-icon">📄</div>
             <h1>WordPress REST API Explorer</h1>
             <p class="upload-description">
-                Upload your WordPress REST API JSON file to explore and understand all available endpoints, methods, and parameters.
+                Upload your WordPress REST API JSON file or load it directly from a URL to explore all available endpoints, methods, and parameters.
             </p>
-            <label for="fileInput" class="upload-btn">
-                📁 Upload JSON File
-            </label>
-            <input type="file" id="fileInput" accept=".json" class="hidden">
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label for="fileInput" class="upload-btn">
+                    📁 Upload JSON File
+                </label>
+                <input type="file" id="fileInput" accept=".json" class="hidden">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;">
+                <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
+                <span style="color: #6b7280; font-weight: 600;">OR</span>
+                <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <input 
+                    type="url" 
+                    id="urlInput" 
+                    placeholder="https://example.com/wp-json"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; margin-bottom: 1rem;"
+                >
+                <button id="loadUrlBtn" class="upload-btn" style="width: 100%;">
+                    🌐 Load from URL
+                </button>
+                <p id="urlError" class="hidden" style="color: #ef4444; margin-top: 0.5rem; font-size: 0.875rem;"></p>
+                <p id="urlLoading" class="hidden" style="color: #3b82f6; margin-top: 0.5rem; font-size: 0.875rem;">
+                    ⏳ Loading API data...
+                </p>
+            </div>
         </div>
 
         <!-- Main App -->
@@ -522,10 +547,64 @@
         // File upload handlers
         document.getElementById('fileInput').addEventListener('change', handleFileUpload);
         document.getElementById('reloadFile').addEventListener('change', handleFileUpload);
+        document.getElementById('loadUrlBtn').addEventListener('click', handleUrlLoad);
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUrlLoad();
+            }
+        });
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value.toLowerCase();
             renderRoutes();
         });
+
+        async function handleUrlLoad() {
+            const urlInput = document.getElementById('urlInput');
+            const url = urlInput.value.trim();
+            const errorEl = document.getElementById('urlError');
+            const loadingEl = document.getElementById('urlLoading');
+
+            // Validate URL
+            if (!url) {
+                showError('Please enter a URL');
+                return;
+            }
+
+            // Ensure URL ends with /wp-json if not already
+            let apiUrl = url;
+            if (!apiUrl.includes('/wp-json')) {
+                apiUrl = apiUrl.replace(/\/$/, '') + '/wp-json';
+            }
+
+            // Show loading state
+            errorEl.classList.add('hidden');
+            loadingEl.classList.remove('hidden');
+            document.getElementById('loadUrlBtn').disabled = true;
+
+            try {
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                apiData = data;
+                initializeApp();
+            } catch (error) {
+                console.error('Error loading API:', error);
+                showError(`Failed to load API: ${error.message}. Make sure the URL is correct and the API is accessible.`);
+            } finally {
+                loadingEl.classList.add('hidden');
+                document.getElementById('loadUrlBtn').disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('urlError');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
 
         function handleFileUpload(e) {
             const file = e.target.files[0];
